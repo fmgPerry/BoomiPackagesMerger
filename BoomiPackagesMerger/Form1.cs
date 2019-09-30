@@ -141,48 +141,26 @@ namespace BoomiPackagesMerger
 
         private void MergeIt()
         {
+            mergedBranchPackages = PackageLinesBase;
+
             foreach (var packageLinesBranch in PackageLinesBranches)
             {
-                foreach (var baseLine in PackageLinesBase)
+                foreach (var branchLine in packageLinesBranch)
                 {
-                    var processName = baseLine.ProcessName;
-                    var branchLine = packageLinesBranch.FirstOrDefault(b => b.ProcessName == processName);
-                    
-                    if (branchLine != null)
+                    var processName = branchLine.ProcessName;
+                    var mergedLine = mergedBranchPackages.FirstOrDefault(m => m.ProcessName == processName);
+                    if (mergedLine == null)
                     {
-                        var branchPackageVersion = Convert.ToInt32(branchLine.PackageVersion);
-                        var mergedPackageVersion = 0;
-                        var mergedLine = mergedBranchPackages.FirstOrDefault(m => m.ProcessName == processName);
-                        if (mergedLine == null)
-                        {
-                            mergedPackageVersion = Convert.ToInt32(baseLine.PackageVersion);
-                            mergedBranchPackages.Add(branchPackageVersion > mergedPackageVersion ? branchLine : baseLine);
-                        }
-                        else
-                        {
-                            mergedPackageVersion = Convert.ToInt32(mergedLine.PackageVersion);
-                            branchLine.isNew = mergedLine.FromFileName == "base" ? false : branchLine.isNew;
-                            var index = mergedBranchPackages.IndexOf(mergedLine);
-                            mergedBranchPackages[index] = branchPackageVersion > mergedPackageVersion ? branchLine : mergedLine;
-                        }
+                        mergedBranchPackages.Add(branchLine);
                     }
                     else
                     {
-                        var mergedPackageEntry = mergedBranchPackages.FirstOrDefault(m => m.ProcessName == processName);
-                        if (mergedPackageEntry == null)
-                        {
-                            mergedBranchPackages.Add(baseLine);
-                        }
-                    }
-                }
+                        branchLine.isNew = mergedLine.isNew;
+                        var mergedLineVersion = Convert.ToInt32(mergedLine.PackageVersion);
+                        var branchLineVersion = Convert.ToInt32(branchLine.PackageVersion);
+                        var index = mergedBranchPackages.IndexOf(mergedLine);
+                        mergedBranchPackages[index] = branchLineVersion > mergedLineVersion ? branchLine : mergedLine;
 
-                var newLines = packageLinesBranch.Where(l => l.isNew);
-                foreach(var newLine in newLines)
-                {
-                    var mergedLine = mergedBranchPackages.FirstOrDefault(m => m.ProcessName == newLine.ProcessName);
-                    if (mergedLine == null)
-                    {
-                        mergedBranchPackages.Add(newLine);
                     }
                 }
             }
@@ -197,7 +175,7 @@ namespace BoomiPackagesMerger
 
             var PackageLinesBranch = new List<PackageEntry>();
 
-        var lines = new List<string>();
+            var lines = new List<string>();
             var lineCount = 0;
             using (var fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             using (var reader = new StreamReader(fileStream))
