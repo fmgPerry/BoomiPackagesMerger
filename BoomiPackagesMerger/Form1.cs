@@ -22,7 +22,6 @@ namespace BoomiPackagesMerger
         private static string basePackageFileName;
         private List<BranchPackage> branchPackages = new List<BranchPackage>();
         private List<PackageEntry> PackageLinesBase = new List<PackageEntry>();
-        //private List<PackageEntry> PackageLinesBranch = new List<PackageEntry>();
         private List<List<PackageEntry>> PackageLinesBranches = new List<List<PackageEntry>>();
         private List<PackageEntry> mergedBranchPackages = new List<PackageEntry>();
 
@@ -111,6 +110,8 @@ namespace BoomiPackagesMerger
             {
                 Process.Start(mergedFileName);
             }
+
+            buttonMerge.Enabled = false;
         }
 
         private void WriteCSV()
@@ -156,10 +157,11 @@ namespace BoomiPackagesMerger
                     else
                     {
                         branchLine.isNew = mergedLine.isNew;
-                        var mergedLineVersion = Convert.ToInt32(mergedLine.PackageVersion);
-                        var branchLineVersion = Convert.ToInt32(branchLine.PackageVersion);
+                        var mergedLineVersion = Convert.ToInt32(Convert.ToDecimal(mergedLine.PackageVersion));
+                        var branchLineVersion = Convert.ToInt32(Convert.ToDecimal(branchLine.PackageVersion));
                         var index = mergedBranchPackages.IndexOf(mergedLine);
-                        mergedBranchPackages[index] = branchLineVersion > mergedLineVersion ? branchLine : mergedLine;
+                        var lineToKeep = branchLineVersion > mergedLineVersion ? branchLine : mergedLine;
+                        mergedBranchPackages[index] = lineToKeep;
 
                     }
                 }
@@ -216,6 +218,21 @@ namespace BoomiPackagesMerger
             {
                 PackageLinesBranches.Add(PackageLinesBranch);
             }
+        }
+
+        private void buttonReset_Click(object sender, EventArgs e)
+        {
+            labelMergingInto.Text = mergingInto;
+            labelBranch1.Text = $@"Branch 1: ";
+            labelBranch2.Text = $@"Branch 2: ";
+            labelBranch3.Text = $@"Branch 3: ";
+
+            branchPackages.Clear();
+            PackageLinesBase.Clear();
+            PackageLinesBranches.Clear();
+            mergedBranchPackages.Clear();
+
+            buttonMerge.Enabled = true;
         }
     }
 }

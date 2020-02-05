@@ -41,6 +41,7 @@
             this.openFileDialogBranch2 = new System.Windows.Forms.OpenFileDialog();
             this.openFileDialogBranch3 = new System.Windows.Forms.OpenFileDialog();
             this.buttonMerge = new System.Windows.Forms.Button();
+            this.buttonReset = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // openFileDialogBase
@@ -149,11 +150,22 @@
             this.buttonMerge.UseVisualStyleBackColor = true;
             this.buttonMerge.Click += new System.EventHandler(this.buttonMerge_Click);
             // 
+            // buttonReset
+            // 
+            this.buttonReset.Location = new System.Drawing.Point(12, 191);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(125, 23);
+            this.buttonReset.TabIndex = 9;
+            this.buttonReset.Text = "Reset";
+            this.buttonReset.UseVisualStyleBackColor = true;
+            this.buttonReset.Click += new System.EventHandler(this.buttonReset_Click);
+            // 
             // FormBoomiPackagesMerger
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(800, 238);
+            this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.buttonMerge);
             this.Controls.Add(this.labelBranch3);
             this.Controls.Add(this.labelBranch2);
@@ -164,7 +176,7 @@
             this.Controls.Add(this.buttonPackagesBranch1);
             this.Controls.Add(this.buttonPackagesBase);
             this.Name = "FormBoomiPackagesMerger";
-            this.Text = "Form1";
+            this.Text = "Boomi Packages Merger";
             this.Load += new System.EventHandler(this.FormBoomiPackagesMerger_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -186,6 +198,7 @@
         private System.Windows.Forms.OpenFileDialog openFileDialogBranch2;
         private System.Windows.Forms.OpenFileDialog openFileDialogBranch3;
         private System.Windows.Forms.Button buttonMerge;
+        private System.Windows.Forms.Button buttonReset;
     }
 }
 
