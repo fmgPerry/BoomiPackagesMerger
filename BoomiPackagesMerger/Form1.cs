@@ -25,6 +25,7 @@ namespace BoomiPackagesMerger
         private List<List<PackageEntry>> PackageLinesBranches = new List<List<PackageEntry>>();
         private List<PackageEntry> mergedBranchPackages = new List<PackageEntry>();
 
+
         public FormBoomiPackagesMerger()
         {
             InitializeComponent();
@@ -86,18 +87,30 @@ namespace BoomiPackagesMerger
 
         private void buttonMerge_Click(object sender, EventArgs e)
         {
+            var inclMergeResult = MessageBox.Show(text: @"
+Add Merge result columns?
+Yes - 2 columns added, need to be removed before commit
+No - as is, ready to commit", 
+caption: @"Add Merge result columns?", 
+buttons:MessageBoxButtons.YesNoCancel, 
+icon:MessageBoxIcon.Question);
+
+            if (inclMergeResult == DialogResult.Cancel) return;
+            
+            var includeMergeResults = inclMergeResult == DialogResult.Yes;
+
             try
             {
                 PackageLinesBranches.Clear();
 
-                ReadPackages(basePackageFileName, "base", true);
+                ReadPackages(basePackageFileName, "base", isBase:true, isIncludeMergeResults:includeMergeResults);
                 foreach (var branchPackage in branchPackages)
                 {
-                    ReadPackages(branchPackage.Path, branchPackage.FileName, false);
+                    ReadPackages(branchPackage.Path, branchPackage.FileName, isBase:false, isIncludeMergeResults: includeMergeResults);
                 }
 
                 MergeIt();
-                WriteCSV();
+                WriteCSV(includeMergeResults);
             }
 
             catch (Exception ex)
@@ -105,8 +118,8 @@ namespace BoomiPackagesMerger
                 MessageBox.Show(ex.Message);
             }
 
-            var dialogResult = MessageBox.Show("Open the merged file?", "Done", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (dialogResult == DialogResult.Yes)
+            var openMergedFile = MessageBox.Show("Open the merged file?", "Done", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (openMergedFile == DialogResult.Yes)
             {
                 Process.Start(mergedFileName);
             }
@@ -114,16 +127,18 @@ namespace BoomiPackagesMerger
             buttonMerge.Enabled = false;
         }
 
-        private void WriteCSV()
+        private void WriteCSV(bool isIncludeMergeResults)
         {
             var packageLines = new List<string>();
-            packageLines.Add(@"PackageId,PackageVersion,ProcessName,PackageNotes,FromFileName,isNew");
+            var header = $@"PackageId,PackageVersion,ProcessName,PackageNotes{(isIncludeMergeResults ? ", FromFileName, isNew" : "")}";
+            packageLines.Add(header);
 
             var orderedMergedPackageLines = mergedBranchPackages.OrderBy(p => p.ProcessName);
             foreach(var line in orderedMergedPackageLines)
             {
-                var ss = $@"{line.PackageId},{line.PackageVersion},{line.ProcessName},{line.PackageNotes},{line.FromFileName},{line.isNew}";
-                packageLines.Add(ss);
+                var packageLine = $@"{line.PackageId},{line.PackageVersion},{line.ProcessName},{line.PackageNotes}";
+                packageLine += isIncludeMergeResults ? $@",{line.FromFileName},{line.isNew}" : "";
+                packageLines.Add(packageLine);
             }
 
             if(File.Exists(mergedFileName))
@@ -168,7 +183,7 @@ namespace BoomiPackagesMerger
             }
         }
 
-        private void ReadPackages(string filename, string fromFileName, bool isBase)
+        private void ReadPackages(string filename, string fromFileName, bool isBase, bool isIncludeMergeResults)
         {
             if (isBase)
             {
@@ -201,8 +216,11 @@ namespace BoomiPackagesMerger
                 entry.PackageVersion = entries[1];
                 entry.ProcessName = entries[2];
                 entry.PackageNotes = entries[3];
-                entry.FromFileName = fromFileName;
-                entry.isNew = !isBase;
+                if (isIncludeMergeResults)
+                {
+                    entry.FromFileName = fromFileName;
+                    entry.isNew = !isBase;
+                }
 
                 if (isBase)
                 {
