@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormBoomiPackagesMerger));
             this.openFileDialogBase = new System.Windows.Forms.OpenFileDialog();
             this.openFileDialogBranch1 = new System.Windows.Forms.OpenFileDialog();
             this.buttonPackagesBase = new System.Windows.Forms.Button();
@@ -175,6 +176,7 @@
             this.Controls.Add(this.labelMergingInto);
             this.Controls.Add(this.buttonPackagesBranch1);
             this.Controls.Add(this.buttonPackagesBase);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormBoomiPackagesMerger";
             this.Text = "Boomi Packages Merger";
             this.Load += new System.EventHandler(this.FormBoomiPackagesMerger_Load);
